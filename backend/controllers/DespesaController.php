@@ -104,7 +104,7 @@ class DespesaController extends Controller
         $beneficiarioModel = new Beneficiario();
         $itemModel = new Item();
         $despesapassagemModel = new DespesaPassagem();
-       // $despesadiariaModel = new DespesaDiaria();
+        $despesadiariaModel = new DespesaDiaria();
 
         $fornecedores = $fornecedorModel->find()->orderBy('nome ASC')->all();
 
@@ -119,7 +119,7 @@ class DespesaController extends Controller
             $fornecedorModel->load(Yii::$app->request->post());
             $itemModel->load(Yii::$app->request->post());
             $despesapassagemModel->load(Yii::$app->request->post());
-           // $despesadiariaModel->load(Yii::$app->request->post());
+            $despesadiariaModel->load(Yii::$app->request->post());
 
             $data_pgto = \DateTime::createFromFormat('d/m/Y', $despesaModel->data_pgto);
             $data_emissao_NF = \DateTime::createFromFormat('d/m/Y', $despesaModel->data_emissao_NF);
@@ -133,10 +133,10 @@ class DespesaController extends Controller
             $despesapassagemModel->data_hora_volta = isset($data_hora_volta) && !empty($data_hora_volta) ? $data_hora_volta->format('Y-m-d h:m') : null;
 
             // recuperação valores para despesa diaria
-           // $data_hora_ida = \DateTime::createFromFormat('d/m/Y h:m', $despesadiariaModel->data_hora_ida);
-           // $data_hora_volta = \DateTime::createFromFormat('d/m/Y h:m', $despesadiariaModel->data_hora_volta);
-           // $despesadiariaModel->data_hora_ida = isset($data_hora_ida) && !empty($data_hora_ida) ? $data_hora_ida->format('Y-m-d h:m') : null;
-           // $despesadiariaModel->data_hora_volta = isset($data_hora_volta) && !empty($data_hora_volta) ? $data_hora_volta->format('Y-m-d h:m') : null;
+            $data_hora_ida = \DateTime::createFromFormat('d/m/Y h:m', $despesadiariaModel->data_hora_ida);
+            $data_hora_volta = \DateTime::createFromFormat('d/m/Y h:m', $despesadiariaModel->data_hora_volta);
+            $despesadiariaModel->data_hora_ida = isset($data_hora_ida) && !empty($data_hora_ida) ? $data_hora_ida->format('Y-m-d h:m') : null;
+            $despesadiariaModel->data_hora_volta = isset($data_hora_volta) && !empty($data_hora_volta) ? $data_hora_volta->format('Y-m-d h:m') : null;
 
 
             if(!empty($beneficiarioModel->nome) || !empty($beneficiarioModel->rg)){
@@ -170,13 +170,13 @@ class DespesaController extends Controller
 
                     }
 
-                    /*if(!empty($despesadiariaModel->data_hora_ida) || !empty($despesadiariaModel->data_hora_volta) || !empty($despesadiariaModel->destino) || !empty($despesadiariaModel->localizador)){
+                    if(!empty($despesadiariaModel->data_hora_ida) || !empty($despesadiariaModel->data_hora_volta) || !empty($despesadiariaModel->destino) || !empty($despesadiariaModel->localizador)){
 
                         $despesadiariaModel->save();
                         $despesadiariaModel->id_despesa = $despesaModel->id ;
 
 
-                    }*/
+                    }
                 }
             }
 
@@ -191,7 +191,7 @@ class DespesaController extends Controller
             'itemModel' => $itemModel,
             'fornecedores' => $listaFornecedores,
             'despesapassagemModel' => $despesapassagemModel,
-            //'despesadiariaModel' => $despesadiariaModel
+            'despesadiariaModel' => $despesadiariaModel
         ]);
     }
 
@@ -246,10 +246,10 @@ class DespesaController extends Controller
             $despesapassagemModel->data_hora_volta = isset($data_hora_volta) && !empty($data_hora_volta) ? $data_hora_volta->format('Y-m-d h:m') : null;
 
             // recuperação valores para despesa diaria
-           // $data_hora_ida = \DateTime::createFromFormat('d/m/Y h:m', $despesadiariaModel->data_hora_ida);
-            //$data_hora_volta = \DateTime::createFromFormat('d/m/Y h:m', $despesadiariaModel->data_hora_volta);
-            //$despesadiariaModel->data_hora_ida = isset($data_hora_ida) && !empty($data_hora_ida) ? $data_hora_ida->format('Y-m-d h:m') : null;
-            //$despesadiariaModel->data_hora_volta = isset($data_hora_volta) && !empty($data_hora_volta) ? $data_hora_volta->format('Y-m-d h:m') : null;
+            $data_hora_ida = \DateTime::createFromFormat('d/m/Y h:m', $despesadiariaModel->data_hora_ida);
+            $data_hora_volta = \DateTime::createFromFormat('d/m/Y h:m', $despesadiariaModel->data_hora_volta);
+            $despesadiariaModel->data_hora_ida = isset($data_hora_ida) && !empty($data_hora_ida) ? $data_hora_ida->format('Y-m-d h:m') : null;
+            $despesadiariaModel->data_hora_volta = isset($data_hora_volta) && !empty($data_hora_volta) ? $data_hora_volta->format('Y-m-d h:m') : null;
 
 
             $fornecedores = $fornecedorModel->find()->orderBy('nome ASC')->all();
