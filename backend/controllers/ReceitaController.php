@@ -67,6 +67,7 @@ class ReceitaController extends Controller
         $model = new Receita();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $this->mensagens('success', 'SALVO', "A receita foi salva com sucesso!");
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -86,7 +87,8 @@ class ReceitaController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post()) && $model->save() ) {
+            $this->mensagens('success', 'ALTERAR', 'A receita foi salva com sucesso!');
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -105,6 +107,7 @@ class ReceitaController extends Controller
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
+        $this->mensagens('success', 'EXCLUIR', 'A receita foi excluída com sucesso.');
 
         return $this->redirect(['index']);
     }
@@ -123,5 +126,20 @@ class ReceitaController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    /* Envio de mensagens para views
+       Tipo: success, danger, warning*/
+    protected function mensagens($tipo, $titulo, $mensagem){
+        Yii::$app->session->setFlash($tipo, [
+            'type' => $tipo,
+            'icon' => 'home',
+            'duration' => 5000,
+            'message' => $mensagem,
+            'title' => $titulo,
+            'positonY' => 'top',
+            'positonX' => 'center',
+            'showProgressbar' => true,
+        ]);
     }
 }
