@@ -60,4 +60,14 @@ class Beneficiario extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Despesa::className(), ['id_beneficiario' => 'id']);
     }
+
+    public function beforeSave($insert){
+        if(!parent::beforeSave($insert)){
+            return false;
+        }
+        if(empty($this->nome) && empty($this->rg) && empty($this->orgao_emissor) && empty($this->nivel_academico)){
+            return false;
+        }
+        return true;
+    }
 }
