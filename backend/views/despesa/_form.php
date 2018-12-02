@@ -26,12 +26,12 @@ $script = <<< JS
         $('#despesa-valor_unitario-disp').on("keyup", function(){
             let unitario = clearValue($('#despesa-valor_unitario-disp').val());
             let valorTotal = unitario * $('#despesa-qtde').val();
-            $('#valor_total').val('R$' + valorTotal);
+            $('#valor_total').val('R$' + valorTotal.toFixed(2));
         });
         $('#despesa-qtde').on("keyup", function(){  
             let unitario = clearValue($('#despesa-valor_unitario-disp').val());
             let valorTotal = unitario * $('#despesa-qtde').val();
-            $('#valor_total').val('R$' + valorTotal);
+            $('#valor_total').val('R$' + valorTotal.toFixed(2));
         });
         
         $('#despesa-tipo_desp').on("change", function(){
@@ -116,7 +116,7 @@ $this->registerJs($script, View::POS_READY);
         </div>
 
         <div class="col-md-4">
-            <label for="nome_fornecedor">Fornecedor</label>
+            <label for="fornecedor-nome">Fornecedor</label>
             <?= AutoComplete::widget([
                 'model' => $fornecedorModel,
                 'attribute' => 'nome',
@@ -125,8 +125,8 @@ $this->registerJs($script, View::POS_READY);
                 ],
                 'options' => [
                     'class' => 'form-control',
-                    'id' => 'nome_fornecedor',
-                    'onchange' => '$.get( "'.Url::toRoute(['/despesa/getfornecedorinfo']).'", { nome : $(this).val() })
+                    'id' => 'fornecedor-nome',
+                    'onblur' => '$.get( "'.Url::toRoute(['/despesa/getfornecedorinfo']).'", { nome : $(this).val() })
                                     .done(function(fornecedor) {
                                         if(fornecedor.id !== null){
                                             $("#fornecedor-cpf_cnpj").val(fornecedor.cpf_cnpj);
