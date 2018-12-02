@@ -6,23 +6,22 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model backend\models\Receita */
 
-$this->title = $model->id;
+$this->title = 'Receita '.$model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Receitas', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="receita-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+        <?= Html::Button('Voltar', ['class' => 'btn btn-warning', 'onclick' => 'history.go(-1)']) ?>
+        <?= Html::a('Alterar', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Excluir', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
+                'confirm' => 'Deseja realmente excluir este item?',
+                'method' => 'POST',
+            ]
         ]) ?>
     </p>
 
@@ -30,10 +29,21 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'valor',
+            [
+                'attribute' => 'valor',
+                'format' => [
+                    'currency',
+                    'BRL'
+                ]
+            ],
             'data_cadastro',
-            'tipo',
-            'id_projeto',
+            [
+                'attribute' => 'tipo',
+                'value' => function($model) {
+                    $tipos = $model->getTipos();
+                    return $tipos[$model->tipo];
+                }
+            ],
         ],
     ]) ?>
 
