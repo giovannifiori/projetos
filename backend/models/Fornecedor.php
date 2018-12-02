@@ -44,4 +44,14 @@ class Fornecedor extends \yii\db\ActiveRecord
             'cpf_cnpj' => 'CPF/CNPJ',
         ];
     }
+
+    public function beforeSave($insert){
+        if(!parent::beforeSave($insert)){
+            return false;
+        }
+        if(empty($this->nome) || empty($this->cpf_cnpj)){
+            return false;
+        }
+        return true;
+    }
 }
