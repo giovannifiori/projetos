@@ -46,6 +46,12 @@
                     'url' => ['despesa/index'],
                     'visible' => (Yii::$app->user->identity->checarAcesso('administrador') || Yii::$app->user->identity->checarAcesso('secretaria')),
                 ],
+                [
+                    'label' => 'Receitas',
+                    'icon' => 'fa fa-list-alt',
+                    'url' => ['receita/index'],
+                    'visible' => (Yii::$app->user->identity->checarAcesso('administrador') || Yii::$app->user->identity->checarAcesso('secretaria')),
+                ],
             ]
         ]) ?>
     </section>
