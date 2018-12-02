@@ -3,6 +3,7 @@
 namespace backend\models;
 
 use Yii;
+use backend\controllers\SiteController;
 
 /**
  * This is the model class for table "receita".
@@ -32,7 +33,7 @@ class Receita extends \yii\db\ActiveRecord
     {
         return [
             [['valor'], 'number'],
-            [['data_cadastro'], 'safe'],
+            [['data_cadastro'], 'date', 'format' => 'dd/mm/yyyy'],
             [['id_projeto'], 'integer'],
             [['tipo'], 'string', 'max' => 30],
             // [['id_projeto'], 'exist', 'skipOnError' => true, 'targetClass' => Projeto::className(), 'targetAttribute' => ['id_projeto' => 'id']],
@@ -63,8 +64,27 @@ class Receita extends \yii\db\ActiveRecord
 
     public function getTipos(){
         return [
-            'recurso' => 'Recurso',
-            'rendimento' => 'Rendimento'
+            0 => 'Recurso',
+            1 => 'Rendimento'
         ];
+    }
+
+    public function beforeSave($insert){
+        if(!parent::beforeSave($insert)){
+            return false;
+        }
+        if($this->data_cadastro != NULL){
+            $this->data_cadastro = \DateTime::createFromFormat('d/m/Y', $this->data_cadastro)->format('Y-m-d');
+        }
+        
+        return true;
+      }
+
+    public function afterFind(){
+        parent::afterFind();
+        if($this->data_cadastro != NULL){
+            $this->data_cadastro = date('d/m/Y', strtotime($this->data_cadastro));
+        }
+        return true;
     }
 }

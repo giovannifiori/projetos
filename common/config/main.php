@@ -13,7 +13,7 @@ return [
             'dateFormat' => 'dd/MM/yyyy',
             'locale' => 'pt-BR',
             'decimalSeparator' => ',',
-            'thousandSeparator' => ' ',
+            'thousandSeparator' => '.',
             'currencyCode' => 'R$',
             'nullDisplay' => '',
 		],
