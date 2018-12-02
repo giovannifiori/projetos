@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
-use backend\models\Item;
+use backend\models\Fornecedor;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\DespesaSearch */
@@ -14,7 +14,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="despesa-index">
 
     <p>
-        <?= Html::a('Cadastrar', ['despesa/create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Nova despesa', ['despesa/create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([
@@ -22,27 +22,33 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             
-            'id',
             [
-                'attribute' => 'id_item',
-                'label' => 'Item',
+                'attribute' => 'tipo_desp',
+                'label' => 'Tipo',
                 'value' => function($model) {
-                    $item = Item::findOne($model->id_item);
-                    return isset($item) ? $item->descricao : "Item não registrado";
+                    $t = $model->getTiposDespesa();
+                    return isset($t) ? $t[$model->tipo_desp] : "-";
+                }
+            ],
+            [
+                'attribute' => 'id_fornecedor',
+                'label' => 'Fornecedor',
+                'value' => function($model) {
+                    $f = Fornecedor::findOne($model->id_fornecedor);
+                    return isset($f) ? $f->nome : "Fornecedor não cadastrado";
+                }
+            ],
+            'numero_cheque',
+            [
+                'label' => 'Valor total',
+                'value' => function($model){
+                    return "R$" . ($model->valor_unitario * $model->qtde);
                 }
             ],
             [
                 'attribute' => 'status',
                 'value' => function($model){
                     return $model->getStatus()[$model->status];
-                }
-            ],
-            'objetivo',
-            'pendencias',
-            [
-                'label' => 'Valor total',
-                'value' => function($model){
-                    return "R$" . ($model->valor_unitario * $model->qtde);
                 }
             ],
             ['class' => 'yii\grid\ActionColumn'],
