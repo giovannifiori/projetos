@@ -22,67 +22,43 @@ $script = <<< JS
     
     $(document).ready(function(){
         $('input').attr('autocomplete','off');
-       // toggleFields();
-       $('#despesa-tipo_desp').val("0");
-       $('.beneficiario-fields').hide();
-       $('.despesapassagem-fields').hide();
-       $('.despesadiaria-fields').hide();
-        $("#tipo_desp-alert").hide()
-        $('#despesa-valor_unitario').on("keyup", function(){
-            $('#despesa-valor_unitario').val($('#despesa-valor_unitario').val().replace(',', '.'));
-            let valorTotal = $('#despesa-valor_unitario').val() * $('#despesa-qtde').val();
+        toggleFields();
+        $('#despesa-valor_unitario-disp').on("keyup", function(){
+            let unitario = clearValue($('#despesa-valor_unitario-disp').val());
+            let valorTotal = unitario * $('#despesa-qtde').val();
             $('#valor_total').val('R$' + valorTotal);
         });
         $('#despesa-qtde').on("keyup", function(){  
-            let valorTotal = $('#despesa-valor_unitario').val() * $('#despesa-qtde').val();
+            let unitario = clearValue($('#despesa-valor_unitario-disp').val());
+            let valorTotal = unitario * $('#despesa-qtde').val();
             $('#valor_total').val('R$' + valorTotal);
         });
         
-        //parte javascrip para esconder ou mostrar os campos dependendo do tipo escolhido
         $('#despesa-tipo_desp').on("change", function(){
-            let tipo = $('#despesa-tipo_desp').val();
-            
-           
-            if (tipo == 1 || tipo == 2){
-                
-                 $('.beneficiario-fields').hide();
-                 $('.despesapassagem-fields').hide();
-                 $('.despesadiaria-fields').hide();
-                
-            } else if (tipo == 3 || tipo ==4){
-                
-                $('.beneficiario-fields').show();
-                 $('.despesapassagem-fields').show();
-                 $('.despesadiaria-fields').hide();
-                
-            } else if (tipo == 5 || tipo ==6){
-                
-                 $('.beneficiario-fields').show();
-                 $('.despesapassagem-fields').hide();
-                 $('.despesadiaria-fields').show();
-            }  else {
-                 $('.beneficiario-fields').hide();
-                 $('.despesapassagem-fields').hide();
-                 $('.despesadiaria-fields').hide();
-            }
-            
-           // toggleFields();
-           /* if(TIPOS.MATERIAL_SERVICO.indexOf(parseInt(tipo)) === -1){ 
-                alert('Ainda não é possível cadastrar este tipo de item!');
-                $('#despesa-tipo_desp').val(null);
-                toggleFields();
-            }*/
+           toggleFields();
         });
     });
     
-    /*function toggleFields() {
-        let tipo = $('#despesa-tipo_desp').val();
-        if(TIPOS.MATERIAL_SERVICO.indexOf(parseInt(tipo)) !== -1 || tipo === null){
-            $('.beneficiario-fields').hide();
-        }else{
+    function clearValue(val){
+        return parseFloat(val.replace('R$', '').replace('.', '').replace(',', '.'));
+    }
+    
+    function toggleFields() {
+        let tipo = parseInt($('#despesa-tipo_desp').val());
+        if (tipo === TIPOS.PASSAGEM_NACIONAL || tipo === TIPOS.PASSAGEM_INTERNACIONAL){
             $('.beneficiario-fields').show();
+            $('.despesapassagem-fields').show();
+            $('.despesadiaria-fields').hide();
+        } else if (tipo === TIPOS.DIARIA_NACIONAL || tipo === TIPOS.DIARIA_INTERNACIONAL){
+            $('.beneficiario-fields').show();
+            $('.despesapassagem-fields').hide();
+            $('.despesadiaria-fields').show();
+        }  else {
+            $('.beneficiario-fields').hide();
+            $('.despesapassagem-fields').hide();
+            $('.despesadiaria-fields').hide();
         }
-    }*/
+    }
 JS;
 $this->registerJs($script, View::POS_READY);
 ?>
@@ -90,15 +66,23 @@ $this->registerJs($script, View::POS_READY);
 
 <div class="despesa-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php
+        $form = ActiveForm::begin();
+        $hideTipos = false;
+        if(!$despesaModel->isNewRecord){
+            $hideTipos = true;
+        }
+
+    ?>
     <?= $form->errorSummary($despesaModel); ?>
 
-    <!--inicio formulario despesa -->
     <div class="row">
-
-        <!-- tipo de despesa -->
         <div class="col-md-4">
-            <?= $form->field($despesaModel, 'tipo_desp')->dropdownList($despesaModel->getTiposDespesa(), (['value' => null]))?>
+            <?= $form->field($despesaModel, 'tipo_desp')->dropdownList($despesaModel->getTiposDespesa(), [
+                    'prompt' => 'Selecione um tipo',
+                    'disabled' => $hideTipos
+                ]
+            )?>
         </div>
 
         <!-- item com auto complete do campo descrição se existir-->
@@ -125,14 +109,12 @@ $this->registerJs($script, View::POS_READY);
             <span class="item-alert" id="item_alert">Este item não existe.</span>
         </div>
 
-        <!-- descrição do item -->
         <div class="col-md-4">
             <?= $form->field($itemModel, 'descricao')->textInput([
                 'readonly' => true
-            ])->label('Descricão item') ?>
+            ])->label('Descricão item projeto') ?>
         </div>
 
-        <!-- Nome fornecedor -->
         <div class="col-md-4">
             <label for="nome_fornecedor">Fornecedor</label>
             <?= AutoComplete::widget([
@@ -157,20 +139,17 @@ $this->registerJs($script, View::POS_READY);
 
         </div>
 
-        <!-- cpf fornecedor -->
         <div class="col-md-4">
             <?= $form->field($fornecedorModel, 'cpf_cnpj')->widget(MaskedInput::className(), [
             'mask' => ['999.999.999-99', '99.999.999/9999-99'],
         ]) ?>
         </div>
 
-        <!-- cpf numero cheque -->
         <div class="col-md-4">
             <?= $form->field($despesaModel, 'numero_cheque')->textInput(['maxlength' => true]) ?>
         </div>
     </div>
 
-    <!-- data pagamento -->
     <div class="row">
         <div class="col-md-4">
         <?= $form->field($despesaModel, 'data_pgto')->widget(MaskedInput::className(), [
@@ -178,29 +157,30 @@ $this->registerJs($script, View::POS_READY);
         ]) ?>
         </div>
 
-        <!-- Nota fiscal ou recebo -->
         <div class="col-md-4">
             <?= $form->field($despesaModel, 'nf_recibo')->textInput(['maxlength' => true]) ?>
         </div>
 
-        <!-- data emissão -->
         <div class="col-md-4">
             <?= $form->field($despesaModel, 'data_emissao_NF')->widget(MaskedInput::className(), [
             'clientOptions' => ['alias' =>  'date']
         ]) ?>
         </div>
 
-        <!-- valor unitario -->
         <div class="col-md-4">
-            <?= $form->field($despesaModel, 'valor_unitario')->textInput() ?>
+            <?= $form->field($despesaModel, 'valor_unitario')->widget(\kartik\money\MaskMoney::class, [
+                    'pluginOptions' => [
+                    'prefix' => 'R$',
+                    'thousands' => '.',
+                    'decimal' => ','
+                ]
+            ]) ?>
         </div>
 
-        <!-- quantidade -->
         <div class="col-md-4">
             <?= $form->field($despesaModel, 'qtde')->textInput() ?>
         </div>
 
-        <!-- valor total -->
         <div class="col-md-4">
             <label for="valor_total">Valor total</label>
             <?= Html::textInput('valor_total', 'R$' .$despesaModel->valor_unitario * $despesaModel->qtde, [
@@ -241,7 +221,6 @@ $this->registerJs($script, View::POS_READY);
 
 
     <!-- despesa passagem -->
-
     <div class="row despesapassagem-fields">
         <div class="col-md-4 ">
             <?= $form->field($despesapassagemModel, 'data_hora_ida')->widget(MaskedInput::className(), [
@@ -281,14 +260,10 @@ $this->registerJs($script, View::POS_READY);
         <div class="col-md-4 ">
             <?= $form->field($despesadiariaModel, 'destino')->textInput() ?>
         </div>
-
-        <div class="col-md-4 ">
-            <?= $form->field($despesadiariaModel, 'localizador')->textInput() ?>
-        </div>
     </div>
 
     <div class="form-group">
-        <?= Html::a('Voltar a lista', ['despesa/index'] ,['class' => 'btn btn-primary']) ?>
+        <?= Html::Button('Cancelar', ['class' => 'btn btn-default', 'onclick' => 'history.go(-1)']) ?>
         <?= Html::submitButton('Salvar', ['class' => 'btn btn-success']) ?>
     </div>
     <?= $form->field($despesaModel, 'id_item')->hiddenInput()->label(false) ?>
