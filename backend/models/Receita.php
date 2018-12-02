@@ -3,7 +3,6 @@
 namespace backend\models;
 
 use Yii;
-use backend\controllers\SiteController;
 
 /**
  * This is the model class for table "receita".
