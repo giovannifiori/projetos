@@ -18,13 +18,14 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="despesa-view">
 
     <p>
+        <?= Html::Button('Voltar', ['class' => 'btn btn-warning', 'onclick' => 'history.go(-1)']) ?>
         <?= Html::a('Alterar', ['update', 'id' => $despesaModel->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Excluir', ['delete', 'id' => $despesaModel->id], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
+                'confirm' => 'Deseja realmente excluir este item?',
+                'method' => 'POST',
+            ]
         ]) ?>
     </p>
 
@@ -52,20 +53,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $model->getStatus()[$model->status];
                 }
             ],
-            [
-                'attribute' => 'data_emissao_NF',
-                'value' => function($model){
-                    return isset($model->data_emissao_NF) ? date('d/m/Y', strtotime($model->data_emissao_NF)) : null;
-                }
-            ],
+            'data_emissao_NF',
             'pendencias:ntext',
             'numero_cheque',
-            [
-                'attribute' => 'data_pgto',
-                'value' => function($model){
-                    return isset($model->data_pgto) ? date('d/m/Y', strtotime($model->data_pgto)) : null;
-                }
-            ],
+            'data_pgto',
             'nf_recibo',
             'objetivo:ntext',
             [

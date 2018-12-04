@@ -45,7 +45,7 @@ class Despesa extends \yii\db\ActiveRecord
     {
         return 
             [[['valor_unitario'], 'number'],
-            [['tipo_desp'], 'required'],
+            [['tipo_desp', 'objetivo', 'valor_unitario', 'qtde'], 'required'],
             [['id_beneficiario', 'id_fornecedor', 'id_item'], 'integer'],
             [['qtde'], 'integer', 'min' => 1],
             [['data_emissao_NF', 'data_pgto'], 'safe'],
@@ -108,20 +108,20 @@ class Despesa extends \yii\db\ActiveRecord
      /**
       * @return \yii\db\ActiveQuery
       */
-    /* public function getDespesaDiaria()
-     {
-         return $this->hasMany(DespesaDiaria::className(), ['id_depesa' => 'id']);
-     }*/
+    public function getDespesaDiaria()
+    {
+        return $this->hasMany(DespesaDiaria::className(), ['id_depesa' => 'id']);
+    }
 
 
     /**
      * @return \yii\db\ActiveQuery
      */
 
-    /* public function getDespesaPassagem()
-     {
+    public function getDespesaPassagem()
+    {
         return $this->hasMany(DespesaPassagem::className(), ['id_despesa' => 'id']);
-     }*/
+    }
 
     /**
      * @return Array
@@ -129,7 +129,6 @@ class Despesa extends \yii\db\ActiveRecord
     public function getTiposDespesa()
     {
         $tipos = [
-            0 => '- Selecionar um tipo de despesa.. -',
             1 => 'Material permanente',
             2 => 'Material de consumo',
             3 => 'Passagem nacional',
@@ -161,5 +160,29 @@ class Despesa extends \yii\db\ActiveRecord
         return $status;
     }
 
+    public function beforeSave($insert){
+        if(!parent::beforeSave($insert)){
+            return false;
+        }
+        if($this->data_emissao_NF != NULL){
+            $this->data_emissao_NF = \DateTime::createFromFormat('d/m/Y', $this->data_emissao_NF)->format('Y-m-d');
+        }
+        if($this->data_pgto != NULL){
+            $this->data_pgto = \DateTime::createFromFormat('d/m/Y', $this->data_pgto)->format('Y-m-d');
+        }
+        
+        return true;
+      }
+
+    public function afterFind(){
+        parent::afterFind();
+        if($this->data_emissao_NF != NULL){
+            $this->data_emissao_NF = date('d/m/Y', strtotime($this->data_emissao_NF));
+        }
+        if($this->data_pgto != NULL){
+            $this->data_pgto = date('d/m/Y', strtotime($this->data_pgto));
+        }
+        return true;
+    }
 
 }

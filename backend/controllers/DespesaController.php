@@ -121,24 +121,6 @@ class DespesaController extends Controller
             $despesapassagemModel->load(Yii::$app->request->post());
             $despesadiariaModel->load(Yii::$app->request->post());
 
-            $data_pgto = \DateTime::createFromFormat('d/m/Y', $despesaModel->data_pgto);
-            $data_emissao_NF = \DateTime::createFromFormat('d/m/Y', $despesaModel->data_emissao_NF);
-            $despesaModel->data_pgto = isset($data_pgto) && !empty($data_pgto) ? $data_pgto->format('Y-m-d') : null;
-            $despesaModel->data_emissao_NF = isset($data_emissao_NF) && !empty($data_emissao_NF) ? $data_emissao_NF->format('Y-m-d') : null;
-
-            // recuperação valores para despesa passagem
-            $data_hora_ida = \DateTime::createFromFormat('d/m/Y h:m', $despesapassagemModel->data_hora_ida);
-            $data_hora_volta = \DateTime::createFromFormat('d/m/Y h:m', $despesapassagemModel->data_hora_volta);
-            $despesapassagemModel->data_hora_ida = isset($data_hora_ida) && !empty($data_hora_ida) ? $data_hora_ida->format('Y-m-d h:m') : null;
-            $despesapassagemModel->data_hora_volta = isset($data_hora_volta) && !empty($data_hora_volta) ? $data_hora_volta->format('Y-m-d h:m') : null;
-
-            // recuperação valores para despesa diaria
-            $data_hora_ida = \DateTime::createFromFormat('d/m/Y h:m', $despesadiariaModel->data_hora_ida);
-            $data_hora_volta = \DateTime::createFromFormat('d/m/Y h:m', $despesadiariaModel->data_hora_volta);
-            $despesadiariaModel->data_hora_ida = isset($data_hora_ida) && !empty($data_hora_ida) ? $data_hora_ida->format('Y-m-d h:m') : null;
-            $despesadiariaModel->data_hora_volta = isset($data_hora_volta) && !empty($data_hora_volta) ? $data_hora_volta->format('Y-m-d h:m') : null;
-
-
             if(!empty($beneficiarioModel->nome) || !empty($beneficiarioModel->rg)){
                 $beneficiarioModel->save();
                 $despesaModel->id_beneficiario = $beneficiarioModel->id;
@@ -155,33 +137,27 @@ class DespesaController extends Controller
                 }
             }
 
-           /* se o tipo de despesa não for do tipo 0 usado para mostrar a messagem para seleção de tipo despesa
-             depois de salvar na tabela despesa deve recuperar o id da despesa e salvar nas tabelas despesa e diaria*/
+            if ($despesaModel->save() ){
 
-           if($despesaModel->tipo_desp !=0){
-                if ($despesaModel->save() ){
+                if(!empty($despesapassagemModel->data_hora_ida) || !empty($despesapassagemModel->data_hora_volta) || !empty($despesapassagemModel->destino) || !empty($despesapassagemModel->localizador)){
 
-                    if(!empty($despesapassagemModel->data_hora_ida) || !empty($despesapassagemModel->data_hora_volta) || !empty($despesapassagemModel->destino) || !empty($despesapassagemModel->localizador)){
+                    $despesapassagemModel->id_despesa = $despesaModel->id;
 
-                        $despesapassagemModel->id_despesa = $despesaModel->id;
-
-                        $despesapassagemModel->save();
+                    $despesapassagemModel->save();
 
 
-                    }
-
-                    if(!empty($despesadiariaModel->data_hora_ida) || !empty($despesadiariaModel->data_hora_volta) || !empty($despesadiariaModel->destino) || !empty($despesadiariaModel->localizador)){
-
-                        $despesadiariaModel->save();
-                        $despesadiariaModel->id_despesa = $despesaModel->id ;
-
-
-                    }
                 }
-            }
 
-           // $despesaModel->save();
-            return $this->redirect(['view', 'id' => $despesaModel->id]);
+                if(!empty($despesadiariaModel->data_hora_ida) || !empty($despesadiariaModel->data_hora_volta) || !empty($despesadiariaModel->destino) || !empty($despesadiariaModel->localizador)){
+
+                    $despesadiariaModel->id_despesa = $despesaModel->id ;
+                    $despesadiariaModel->save();
+
+
+                }
+
+                return $this->redirect(['view', 'id' => $despesaModel->id]);
+            }
         }
                      
         return $this->render('create', [
@@ -234,24 +210,6 @@ class DespesaController extends Controller
             $despesapassagemModel = isset($despesapassagemModel) ? $despesapassagemModel : new DespesaPassagem();
             $despesadiariaModel = isset($despesadiariaModel) ? $despesadiariaModel : new DespesaDiaria();
 
-
-            $despesaModel->data_pgto = date('d/m/Y', strtotime($despesaModel->data_pgto));
-            $despesaModel->data_emissao_NF = date('d/m/Y', strtotime($despesaModel->data_emissao_NF));
-
-
-            // recuperação valores para despesa passagem
-            $data_hora_ida = \DateTime::createFromFormat('d/m/Y h:m', $despesapassagemModel->data_hora_ida);
-            $data_hora_volta = \DateTime::createFromFormat('d/m/Y h:m', $despesapassagemModel->data_hora_volta);
-            $despesapassagemModel->data_hora_ida = isset($data_hora_ida) && !empty($data_hora_ida) ? $data_hora_ida->format('Y-m-d h:m') : null;
-            $despesapassagemModel->data_hora_volta = isset($data_hora_volta) && !empty($data_hora_volta) ? $data_hora_volta->format('Y-m-d h:m') : null;
-
-            // recuperação valores para despesa diaria
-            $data_hora_ida = \DateTime::createFromFormat('d/m/Y h:m', $despesadiariaModel->data_hora_ida);
-            $data_hora_volta = \DateTime::createFromFormat('d/m/Y h:m', $despesadiariaModel->data_hora_volta);
-            $despesadiariaModel->data_hora_ida = isset($data_hora_ida) && !empty($data_hora_ida) ? $data_hora_ida->format('Y-m-d h:m') : null;
-            $despesadiariaModel->data_hora_volta = isset($data_hora_volta) && !empty($data_hora_volta) ? $data_hora_volta->format('Y-m-d h:m') : null;
-
-
             $fornecedores = $fornecedorModel->find()->orderBy('nome ASC')->all();
             $listaFornecedores = [];
             foreach($fornecedores as $f){
@@ -265,24 +223,6 @@ class DespesaController extends Controller
             $beneficiarioModel->load(Yii::$app->request->post());
             $fornecedorModel->load(Yii::$app->request->post());
             $itemModel->load(Yii::$app->request->post());
-
-            $data_pgto = \DateTime::createFromFormat('d/m/Y', $despesaModel->data_pgto);
-            $data_emissao_NF = \DateTime::createFromFormat('d/m/Y', $despesaModel->data_emissao_NF);
-            $despesaModel->data_pgto = $data_pgto->format('Y-m-d');
-            $despesaModel->data_emissao_NF = $data_emissao_NF->format('Y-m-d');
-
-            // recuperação valores para despesa passagem
-            $data_hora_ida = \DateTime::createFromFormat('d/m/Y h:m', $despesapassagemModel->data_hora_ida);
-            $data_hora_volta = \DateTime::createFromFormat('d/m/Y h:m', $despesapassagemModel->data_hora_volta);
-            $despesapassagemModel->data_hora_ida = isset($data_hora_ida) && !empty($data_hora_ida) ? $data_hora_ida->format('Y-m-d h:m') : null;
-            $despesapassagemModel->data_hora_volta = isset($data_hora_volta) && !empty($data_hora_volta) ? $data_hora_volta->format('Y-m-d h:m') : null;
-
-            // recuperação valores para despesa diaria
-            $data_hora_ida = \DateTime::createFromFormat('d/m/Y h:m', $despesadiariaModel->data_hora_ida);
-            $data_hora_volta = \DateTime::createFromFormat('d/m/Y h:m', $despesadiariaModel->data_hora_volta);
-            $despesadiariaModel->data_hora_ida = isset($data_hora_ida) && !empty($data_hora_ida) ? $data_hora_ida->format('Y-m-d h:m') : null;
-            $despesadiariaModel->data_hora_volta = isset($data_hora_volta) && !empty($data_hora_volta) ? $data_hora_volta->format('Y-m-d h:m') : null;
-
 
             if(!empty($beneficiarioModel->nome) || !empty($beneficiarioModel->rg)){
                 $beneficiario = Beneficiario::find()->where(['rg' => $beneficiarioModel->rg])->one();
@@ -323,36 +263,30 @@ class DespesaController extends Controller
                 }
             }
 
-            if($despesaModel->tipo_desp !=0){
-                if ($despesaModel->save() ){
+            if ($despesaModel->save() ){
 
-                    if(!empty($despesapassagemModel->data_hora_ida) || !empty($despesapassagemModel->data_hora_volta) || !empty($despesapassagemModel->destino) || !empty($despesapassagemModel->localizador)){
+                if(!empty($despesapassagemModel->data_hora_ida) || !empty($despesapassagemModel->data_hora_volta) || !empty($despesapassagemModel->destino) || !empty($despesapassagemModel->localizador)){
 
-                        $despesapassagemModel->id_despesa = $despesaModel->id;
+                    $despesapassagemModel->id_despesa = $despesaModel->id;
 
-                        $despesapassagemModel->save();
-
-
-                    }
-
-                    if(!empty($despesadiariaModel->data_hora_ida) || !empty($despesadiariaModel->data_hora_volta) || !empty($despesadiariaModel->destino) || !empty($despesadiariaModel->localizador)){
-
-                        $despesadiariaModel->save();
-                        $despesadiariaModel->id_despesa = $despesaModel->id ;
+                    $despesapassagemModel->save();
 
 
-                    }
                 }
+
+                if(!empty($despesadiariaModel->data_hora_ida) || !empty($despesadiariaModel->data_hora_volta) || !empty($despesadiariaModel->destino) || !empty($despesadiariaModel->localizador)){
+
+                    $despesadiariaModel->save();
+                    $despesadiariaModel->id_despesa = $despesaModel->id ;
+
+
+                }
+
+                return $this->redirect(['view', 'id' => $despesaModel->id]);
             }
 
-            // $despesaModel->save();
-            return $this->redirect(['view', 'id' => $despesaModel->id]);
-        }
 
-           // $despesaModel->save();
-            //return $this->redirect(['index']);
-            
-       // }
+        }
 
         return $this->render('update', [
             'despesaModel' => $despesaModel,

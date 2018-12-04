@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model backend\models\Despesa */
 
-$this->title = 'Cadastrar despesa';
+$this->title = 'Nova despesa';
 $this->params['breadcrumbs'][] = ['label' => 'Despesas', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

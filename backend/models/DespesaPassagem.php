@@ -42,7 +42,7 @@ class DespesaPassagem extends \yii\db\ActiveRecord
             [['data_hora_volta'], 'safe'],
             [['destino'], 'string', 'max' => 200],
             [['localizador'], 'string', 'max'=> 50],
-
+            [['data_hora_volta'], 'compare', 'compareAttribute'=>'data_hora_ida', 'operator'=>'>', 'message'=>'A data de volta deve ser posterior a data de ida.'],
         ];
     }
 
@@ -69,4 +69,28 @@ class DespesaPassagem extends \yii\db\ActiveRecord
         return $this->hasOne(Despesa::className(), ['id' => 'id_despesa']);
     }
 
+    public function beforeSave($insert){
+        if(!parent::beforeSave($insert)){
+            return false;
+        }
+        if($this->data_hora_ida != NULL){
+            $this->data_hora_ida = \DateTime::createFromFormat('d/m/Y H:i', $this->data_hora_ida)->format('Y-m-d H:i');
+        }
+        if($this->data_hora_volta != NULL){
+            $this->data_hora_volta = \DateTime::createFromFormat('d/m/Y H:i', $this->data_hora_volta)->format('Y-m-d H:i');
+        }
+        
+        return true;
+      }
+
+    public function afterFind(){
+        parent::afterFind();
+        if($this->data_hora_ida != NULL){
+            $this->data_hora_ida = date('d/m/Y H:i', strtotime($this->data_hora_ida));
+        }
+        if($this->data_hora_volta != NULL){
+            $this->data_hora_volta = date('d/m/Y H:i', strtotime($this->data_hora_volta));
+        }
+        return true;
+    }
 }
