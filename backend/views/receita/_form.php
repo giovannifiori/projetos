@@ -18,13 +18,7 @@ use yii\widgets\MaskedInput;
 
     <div class="row">
         <div class="col-md-3">
-            <?= $form->field($model, 'valor')->widget(\kartik\money\MaskMoney::class, [
-                'pluginOptions' => [
-                    'prefix' => 'R$',
-                    'thousands' => '.',
-                    'decimal' => ','
-                ]
-            ]) ?>
+            <?= $form->field($model, 'tipo')->dropdownList($model->getTipos()) ?>
         </div>
         <div class="col-md-3">
             <?= $form->field($model, 'data_cadastro')->widget(MaskedInput::classname(), [
@@ -34,7 +28,13 @@ use yii\widgets\MaskedInput;
             ])?>
         </div>
         <div class="col-md-3">
-            <?= $form->field($model, 'tipo')->dropdownList($model->getTipos()) ?>
+            <?= $form->field($model, 'valor')->widget(\kartik\money\MaskMoney::class, [
+                'pluginOptions' => [
+                    'prefix' => 'R$',
+                    'thousands' => '.',
+                    'decimal' => ','
+                ]
+            ]) ?>
         </div>
     </div>
 
