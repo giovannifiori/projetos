@@ -25,19 +25,19 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             [
-                'attribute' => 'valor',
-                'format' => [
-                    'currency',
-                    'BRL'
-                ]
-            ],
-            'data_cadastro',
-            [
                 'attribute' => 'tipo',
                 'value' => function($model) {
                     $tipos = $model->getTipos();
                     return $tipos[$model->tipo];
                 }
+            ],
+            'data_cadastro',
+            [
+                'attribute' => 'valor',
+                'format' => [
+                    'currency',
+                    'BRL'
+                ]
             ],
 
             ['class' => 'yii\grid\ActionColumn'],

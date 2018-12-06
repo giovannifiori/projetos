@@ -28,7 +28,7 @@ $this->registerJs($script, View::POS_READY);
             'mask' => ['999.999.999-99', '99.999.999/9999-99'],
         ]) ?>
         <div class="form-group">
-            <?= Html::a('Voltar a lista', ['fornecedor/index'] ,['class' => 'btn btn-primary']) ?>
+            <?= Html::Button('Cancelar', ['class' => 'btn btn-default', 'onclick' => 'history.go(-1)']) ?>
             <?= Html::submitButton('Salvar', ['class' => 'btn btn-success']) ?>
         </div>
     </div>
