@@ -75,7 +75,8 @@ class DespesaSearch extends Despesa
             ->andFilterWhere(['like', 'pendencias', $this->pendencias])
             ->andFilterWhere(['like', 'numero_cheque', $this->numero_cheque])
             ->andFilterWhere(['like', 'nf_recibo', $this->nf_recibo])
-            ->andFilterWhere(['like', 'objetivo', $this->objetivo]);
+            ->andFilterWhere(['like', 'objetivo', $this->objetivo])
+            ->orderBy('id DESC');
 
         return $dataProvider;
     }
