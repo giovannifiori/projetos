@@ -14,6 +14,7 @@ use backend\models\DespesaDiaria;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 //debugger para restrear erros se tiver
 /*function dbg() {
@@ -114,6 +115,7 @@ class DespesaController extends Controller
         }
         if ($despesaModel->load(Yii::$app->request->post())) {
 
+            $despesaModel->anexo = UploadedFile::getInstance($despesaModel, 'anexo');
 
             $beneficiarioModel->load(Yii::$app->request->post());
             $fornecedorModel->load(Yii::$app->request->post());
@@ -138,24 +140,20 @@ class DespesaController extends Controller
             }
 
             if ($despesaModel->save() ){
-
                 if(!empty($despesapassagemModel->data_hora_ida) || !empty($despesapassagemModel->data_hora_volta) || !empty($despesapassagemModel->destino) || !empty($despesapassagemModel->localizador)){
-
                     $despesapassagemModel->id_despesa = $despesaModel->id;
-
                     $despesapassagemModel->save();
-
-
                 }
-
                 if(!empty($despesadiariaModel->data_hora_ida) || !empty($despesadiariaModel->data_hora_volta) || !empty($despesadiariaModel->destino) || !empty($despesadiariaModel->localizador)){
-
                     $despesadiariaModel->id_despesa = $despesaModel->id ;
                     $despesadiariaModel->save();
-
-
                 }
-
+                if (!empty($despesaModel->anexo) and $despesaModel->upload()) {
+                    $despesaModel->anexo = "d_" . $despesaModel->id . '.' . $despesaModel->anexo->extension;
+                    $despesaModel->save();
+                }else{
+                    $this->mensagens('danger', 'Erro', 'Houve um problema ao fazer upload do anexo.');
+                }
                 return $this->redirect(['view', 'id' => $despesaModel->id]);
             }
         }
@@ -264,24 +262,15 @@ class DespesaController extends Controller
             }
 
             if ($despesaModel->save() ){
-
                 if(!empty($despesapassagemModel->data_hora_ida) || !empty($despesapassagemModel->data_hora_volta) || !empty($despesapassagemModel->destino) || !empty($despesapassagemModel->localizador)){
-
                     $despesapassagemModel->id_despesa = $despesaModel->id;
-
                     $despesapassagemModel->save();
 
-
                 }
-
                 if(!empty($despesadiariaModel->data_hora_ida) || !empty($despesadiariaModel->data_hora_volta) || !empty($despesadiariaModel->destino) || !empty($despesadiariaModel->localizador)){
-
-                    $despesadiariaModel->save();
                     $despesadiariaModel->id_despesa = $despesaModel->id ;
-
-
+                    $despesadiariaModel->save();
                 }
-
                 return $this->redirect(['view', 'id' => $despesaModel->id]);
             }
 
@@ -328,5 +317,20 @@ class DespesaController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    /* Envio de mensagens para views
+       Tipo: success, danger, warning*/
+    protected function mensagens($tipo, $titulo, $mensagem){
+        Yii::$app->session->setFlash($tipo, [
+            'type' => $tipo,
+            'icon' => 'home',
+            'duration' => 5000,
+            'message' => $mensagem,
+            'title' => $titulo,
+            'positonY' => 'top',
+            'positonX' => 'center',
+            'showProgressbar' => true,
+        ]);
     }
 }

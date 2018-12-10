@@ -76,6 +76,15 @@ $viewAttributes = [
             return isset($item) ? $item->descricao : "Item não registrado";
         }
     ],
+    [
+        'attribute' => 'anexo',
+        'value' => function($model){
+            $dir = 'uploads/despesas/'.$model->anexo;
+            $f = $model->anexo;
+            return "<a target='_blank' href='$dir'>$f</a>";
+        },
+        'format' => 'raw'
+    ],
 ];
 
 if(isset($despesapassagemModel) && !empty($despesapassagemModel)){

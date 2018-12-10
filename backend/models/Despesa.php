@@ -3,6 +3,7 @@
 namespace backend\models;
 
 use Yii;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "despesa".
@@ -21,6 +22,7 @@ use Yii;
  * @property int $id_beneficiario
  * @property int $id_fornecedor
  * @property int $id_item
+ * @property Object $anexo
  *
  * @property Beneficiario $beneficiario
  * @property Fornecedor $fornecedor
@@ -55,6 +57,7 @@ class Despesa extends \yii\db\ActiveRecord
             [['id_beneficiario'], 'exist', 'skipOnError' => true, 'targetClass' => Beneficiario::className(), 'targetAttribute' => ['id_beneficiario' => 'id']],
             [['id_fornecedor'], 'exist', 'skipOnError' => true, 'targetClass' => Fornecedor::className(), 'targetAttribute' => ['id_fornecedor' => 'id']],
             [['id_item'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['id_item' => 'id']],
+            [['anexo'], 'file', 'skipOnEmpty' => true, 'maxSize' => 1024 * 1024 * 100],
         ];
     }
 
@@ -77,6 +80,7 @@ class Despesa extends \yii\db\ActiveRecord
             'objetivo' => 'Objetivo',
             'id_beneficiario' => 'Id. Beneficiario',
             'id_fornecedor' => 'Id. Fornecedor',
+            'anexo' => 'Anexo',
             'id_item' => 'Id. Item',
         ];
     }
@@ -183,6 +187,16 @@ class Despesa extends \yii\db\ActiveRecord
             $this->data_pgto = date('d/m/Y', strtotime($this->data_pgto));
         }
         return true;
+    }
+
+    public function upload()
+    {
+        if ($this->validate()) {
+            $this->anexo->saveAs('uploads/despesas/d_' . $this->id . '.' . $this->anexo->extension);
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

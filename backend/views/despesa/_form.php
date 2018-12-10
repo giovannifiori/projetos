@@ -262,6 +262,12 @@ $this->registerJs($script, View::POS_READY);
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-md-4">
+            <?= $form->field($despesaModel, 'anexo')->fileInput() ?>
+        </div>
+    </div>
+
     <div class="form-group">
         <?= Html::Button('Cancelar', ['class' => 'btn btn-default', 'onclick' => 'history.go(-1)']) ?>
         <?= Html::submitButton('Salvar', ['class' => 'btn btn-success']) ?>
