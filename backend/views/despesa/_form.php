@@ -67,7 +67,9 @@ $this->registerJs($script, View::POS_READY);
 <div class="despesa-form">
 
     <?php
-        $form = ActiveForm::begin();
+        $form = ActiveForm::begin([
+            'options' => ['enctype' => 'multipart/form-data']
+        ]);
         $hideTipos = false;
         if(!$despesaModel->isNewRecord){
             $hideTipos = true;
@@ -136,7 +138,6 @@ $this->registerJs($script, View::POS_READY);
                                 });'
                 ]
             ]); ?>
-
         </div>
 
         <div class="col-xs-4">
@@ -166,7 +167,8 @@ $this->registerJs($script, View::POS_READY);
             'clientOptions' => ['alias' =>  'date']
         ]) ?>
         </div>
-
+    </div>
+    <div class="row">
         <div class="col-xs-4">
             <?= $form->field($despesaModel, 'valor_unitario')->widget(\kartik\money\MaskMoney::class, [
                     'pluginOptions' => [
@@ -184,7 +186,7 @@ $this->registerJs($script, View::POS_READY);
         <div class="col-xs-4">
             <label for="valor_total">Valor total</label>
             <?= Html::textInput('valor_total', 'R$' .$despesaModel->valor_unitario * $despesaModel->qtde, [
-                'class' => 'form-control', 
+                'class' => 'form-control',
                 'id' => 'valor_total',
                 'readonly' => true,
                 'autocomplete' => 'off'
@@ -205,16 +207,16 @@ $this->registerJs($script, View::POS_READY);
     </div>
 
     <div class="row beneficiario-fields" >
-        <div class="col-xs-4 ">
+        <div class="col-xs-3 ">
             <?= $form->field($beneficiarioModel, 'nome')->textInput() ?>
         </div>
-        <div class="col-xs-4 ">
+        <div class="col-xs-3 ">
             <?= $form->field($beneficiarioModel, 'rg')->textInput()?>
         </div>
-        <div class="col-xs-4">
+        <div class="col-xs-3">
             <?= $form->field($beneficiarioModel, 'orgao_emissor')->textInput() ?>
         </div>
-        <div class="col-xs-4">
+        <div class="col-xs-3">
             <?= $form->field($beneficiarioModel, 'nivel_academico')->textInput() ?>
         </div>
     </div>
@@ -222,13 +224,13 @@ $this->registerJs($script, View::POS_READY);
 
     <!-- despesa passagem -->
     <div class="row despesapassagem-fields">
-        <div class="col-xs-4 ">
+        <div class="col-xs-2 ">
             <?= $form->field($despesapassagemModel, 'data_hora_ida')->widget(MaskedInput::className(), [
                 'clientOptions' => ['alias' =>  'datetime']
             ]) ?>
         </div>
 
-        <div class="col-xs-4">
+        <div class="col-xs-2">
             <?= $form->field($despesapassagemModel, 'data_hora_volta')->widget(MaskedInput::className(), [
                 'clientOptions' => ['alias' =>  'datetime']
             ]) ?>
