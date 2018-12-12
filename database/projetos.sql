@@ -1,10 +1,8 @@
-CREATE DATABASE  IF NOT EXISTS `projetos` /*!40100 DEFAULT CHARACTER SET latin1 */;
-USE `projetos`;
--- MySQL dump 10.13  Distrib 5.7.23, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.24, for Linux (x86_64)
 --
--- Host: 127.0.0.1    Database: projetos
+-- Host: localhost    Database: projetos
 -- ------------------------------------------------------
--- Server version	5.7.23
+-- Server version	5.7.24
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -32,7 +30,7 @@ CREATE TABLE `beneficiario` (
   `nivel_academico` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `beneficiario_UN` (`rg`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,7 +39,6 @@ CREATE TABLE `beneficiario` (
 
 LOCK TABLES `beneficiario` WRITE;
 /*!40000 ALTER TABLE `beneficiario` DISABLE KEYS */;
-INSERT INTO `beneficiario` VALUES (1,'Novo nome','2121554245','ssp-am','superior');
 /*!40000 ALTER TABLE `beneficiario` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -67,6 +64,7 @@ CREATE TABLE `despesa` (
   `id_beneficiario` int(11) DEFAULT NULL,
   `id_fornecedor` int(11) DEFAULT NULL,
   `id_item` int(11) DEFAULT NULL,
+  `anexo` varchar(320) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `despesa_beneficiario_FK` (`id_beneficiario`),
   KEY `despesa_fornecedor_FK` (`id_fornecedor`),
@@ -74,7 +72,7 @@ CREATE TABLE `despesa` (
   CONSTRAINT `despesa_beneficiario_FK` FOREIGN KEY (`id_beneficiario`) REFERENCES `beneficiario` (`id`),
   CONSTRAINT `despesa_fornecedor_FK` FOREIGN KEY (`id_fornecedor`) REFERENCES `fornecedor` (`id`),
   CONSTRAINT `despesa_item_FK` FOREIGN KEY (`id_item`) REFERENCES `item` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -83,7 +81,6 @@ CREATE TABLE `despesa` (
 
 LOCK TABLES `despesa` WRITE;
 /*!40000 ALTER TABLE `despesa` DISABLE KEYS */;
-INSERT INTO `despesa` VALUES (1,123,1,2,'1','2018-10-19 00:00:00','pp','22222222222222','2018-10-17 00:00:00','1111111111111','desdesaaaaa',1,2,1);
 /*!40000 ALTER TABLE `despesa` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -99,7 +96,6 @@ CREATE TABLE `despesa_diaria` (
   `destino` varchar(200) DEFAULT NULL,
   `data_hora_volta` datetime DEFAULT NULL,
   `data_hora_ida` datetime DEFAULT NULL,
-  `localizador` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id_despesa`),
   CONSTRAINT `despesa_diaria_1_despesa_FK` FOREIGN KEY (`id_despesa`) REFERENCES `despesa` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -152,9 +148,10 @@ CREATE TABLE `fornecedor` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nome` varchar(200) DEFAULT NULL,
   `cpf_cnpj` varchar(30) DEFAULT NULL,
+  `tipo` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `fornecedor_UN` (`cpf_cnpj`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -163,7 +160,7 @@ CREATE TABLE `fornecedor` (
 
 LOCK TABLES `fornecedor` WRITE;
 /*!40000 ALTER TABLE `fornecedor` DISABLE KEYS */;
-INSERT INTO `fornecedor` VALUES (1,'Teste CPF','012.345.678-90'),(2,'Teste CNPJ Mudado','12.378.945/6012-10'),(3,'CNPJ2','01.234.567/8901-05');
+INSERT INTO `fornecedor` VALUES (12,'F1','11.111.111/1111-11',NULL),(13,'F2','22.222.222/2222-22',NULL),(14,'F3','33.333.333/3333-33',NULL),(15,'F4','444.444.444-44',NULL);
 /*!40000 ALTER TABLE `fornecedor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -188,7 +185,7 @@ CREATE TABLE `item` (
   PRIMARY KEY (`id`),
   KEY `item_projeto_FK` (`id_projeto`),
   CONSTRAINT `item_projeto_FK` FOREIGN KEY (`id_projeto`) REFERENCES `projeto` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -197,7 +194,6 @@ CREATE TABLE `item` (
 
 LOCK TABLES `item` WRITE;
 /*!40000 ALTER TABLE `item` DISABLE KEYS */;
-INSERT INTO `item` VALUES (1,NULL,NULL,'01','',1,12,2,'Desc item 01',1);
 /*!40000 ALTER TABLE `item` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -230,7 +226,6 @@ CREATE TABLE `projeto` (
 
 LOCK TABLES `projeto` WRITE;
 /*!40000 ALTER TABLE `projeto` DISABLE KEYS */;
-INSERT INTO `projeto` VALUES (1,'123','2018-10-28 00:00:00','2019-10-10 00:00:00','Coordenador',NULL,NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `projeto` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -245,12 +240,12 @@ CREATE TABLE `receita` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `valor` double DEFAULT NULL,
   `data_cadastro` datetime DEFAULT NULL,
-  `tipo` varchar(30) DEFAULT NULL,
+  `tipo` tinyint(4) DEFAULT NULL,
   `id_projeto` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `receita_projeto_FK` (`id_projeto`),
   CONSTRAINT `receita_projeto_FK` FOREIGN KEY (`id_projeto`) REFERENCES `projeto` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -391,4 +386,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-10-18 16:21:36
+-- Dump completed on 2018-12-12  1:38:20
