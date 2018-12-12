@@ -74,10 +74,9 @@ $this->registerJs($script, View::POS_READY);
         }
 
     ?>
-    <?= $form->errorSummary($despesaModel); ?>
 
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <?= $form->field($despesaModel, 'tipo_desp')->dropdownList($despesaModel->getTiposDespesa(), [
                     'prompt' => 'Selecione um tipo',
                     'disabled' => $hideTipos
@@ -86,7 +85,7 @@ $this->registerJs($script, View::POS_READY);
         </div>
 
         <!-- item com auto complete do campo descrição se existir-->
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <?= $form->field($itemModel, 'numero_item')->textInput([
                 'onkeyup' => '
                     if(!$(this).val()){
@@ -105,17 +104,18 @@ $this->registerJs($script, View::POS_READY);
                             }
                         });
                     }'
-            ])->label('Item') ?>
-            <span class="item-alert" id="item_alert">Este item não existe.</span>
+            ])->label('Item <span class="item-alert" id="item_alert">- Este item não existe.</span>') ?>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <?= $form->field($itemModel, 'descricao')->textInput([
                 'readonly' => true
             ])->label('Descricão item projeto') ?>
         </div>
+    </div>
 
-        <div class="col-md-4">
+    <div class="row">
+        <div class="col-xs-4">
             <label for="fornecedor-nome">Fornecedor</label>
             <?= AutoComplete::widget([
                 'model' => $fornecedorModel,
@@ -139,35 +139,35 @@ $this->registerJs($script, View::POS_READY);
 
         </div>
 
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <?= $form->field($fornecedorModel, 'cpf_cnpj')->widget(MaskedInput::className(), [
-            'mask' => ['999.999.999-99', '99.999.999/9999-99'],
-        ]) ?>
+                'mask' => ['999.999.999-99', '99.999.999/9999-99'],
+            ]) ?>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <?= $form->field($despesaModel, 'numero_cheque')->textInput(['maxlength' => true]) ?>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-xs-4">
         <?= $form->field($despesaModel, 'data_pgto')->widget(MaskedInput::className(), [
             'clientOptions' => ['alias' =>  'date']
         ]) ?>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <?= $form->field($despesaModel, 'nf_recibo')->textInput(['maxlength' => true]) ?>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <?= $form->field($despesaModel, 'data_emissao_NF')->widget(MaskedInput::className(), [
             'clientOptions' => ['alias' =>  'date']
         ]) ?>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <?= $form->field($despesaModel, 'valor_unitario')->widget(\kartik\money\MaskMoney::class, [
                     'pluginOptions' => [
                     'prefix' => 'R$',
@@ -177,11 +177,11 @@ $this->registerJs($script, View::POS_READY);
             ]) ?>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <?= $form->field($despesaModel, 'qtde')->textInput() ?>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <label for="valor_total">Valor total</label>
             <?= Html::textInput('valor_total', 'R$' .$despesaModel->valor_unitario * $despesaModel->qtde, [
                 'class' => 'form-control', 
@@ -193,28 +193,28 @@ $this->registerJs($script, View::POS_READY);
     </div>
 
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <?= $form->field($despesaModel, 'objetivo')->textInput() ?>
         </div>
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <?= $form->field($despesaModel, 'pendencias')->textInput() ?>
         </div>
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <?= $form->field($despesaModel, 'status')->dropdownList($despesaModel->getStatus()) ?>
         </div>
     </div>
 
     <div class="row beneficiario-fields" >
-        <div class="col-md-4 ">
+        <div class="col-xs-4 ">
             <?= $form->field($beneficiarioModel, 'nome')->textInput() ?>
         </div>
-        <div class="col-md-4 ">
+        <div class="col-xs-4 ">
             <?= $form->field($beneficiarioModel, 'rg')->textInput()?>
         </div>
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <?= $form->field($beneficiarioModel, 'orgao_emissor')->textInput() ?>
         </div>
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <?= $form->field($beneficiarioModel, 'nivel_academico')->textInput() ?>
         </div>
     </div>
@@ -222,48 +222,48 @@ $this->registerJs($script, View::POS_READY);
 
     <!-- despesa passagem -->
     <div class="row despesapassagem-fields">
-        <div class="col-md-4 ">
+        <div class="col-xs-4 ">
             <?= $form->field($despesapassagemModel, 'data_hora_ida')->widget(MaskedInput::className(), [
                 'clientOptions' => ['alias' =>  'datetime']
             ]) ?>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <?= $form->field($despesapassagemModel, 'data_hora_volta')->widget(MaskedInput::className(), [
                 'clientOptions' => ['alias' =>  'datetime']
             ]) ?>
         </div>
 
-        <div class="col-md-4 ">
+        <div class="col-xs-4 ">
             <?= $form->field($despesapassagemModel, 'destino')->textInput() ?>
         </div>
 
-        <div class="col-md-4 ">
+        <div class="col-xs-4 ">
             <?= $form->field($despesapassagemModel, 'localizador')->textInput() ?>
         </div>
     </div>
 
     <!-- despesa diaria -->
     <div class="row despesadiaria-fields">
-        <div class="col-md-4 ">
+        <div class="col-xs-4 ">
             <?= $form->field($despesadiariaModel, 'data_hora_ida')->widget(MaskedInput::className(), [
                 'clientOptions' => ['alias' =>  'datetime']
             ]) ?>
         </div>
 
-        <div class="col-md-4 ">
+        <div class="col-xs-4 ">
             <?= $form->field($despesadiariaModel, 'data_hora_volta')->widget(MaskedInput::className(), [
                 'clientOptions' => ['alias' =>  'datetime']
             ]) ?>
         </div>
 
-        <div class="col-md-4 ">
+        <div class="col-xs-4 ">
             <?= $form->field($despesadiariaModel, 'destino')->textInput() ?>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-xs-4">
             <?= $form->field($despesaModel, 'anexo')->fileInput() ?>
         </div>
     </div>
