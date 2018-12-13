@@ -4,6 +4,7 @@ namespace backend\models;
 
 use Yii;
 use yii\web\UploadedFile;
+use DateTime;
 
 /**
  * This is the model class for table "despesa".
@@ -50,7 +51,7 @@ class Despesa extends \yii\db\ActiveRecord
             [['tipo_desp', 'objetivo', 'valor_unitario', 'qtde'], 'required'],
             [['id_beneficiario', 'id_fornecedor', 'id_item'], 'integer'],
             [['qtde'], 'integer', 'min' => 1],
-            [['data_emissao_NF', 'data_pgto'], 'safe'],
+            [['data_emissao_NF', 'data_pgto'], 'date', 'format' => 'dd/mm/yyyy'],
             [['pendencias', 'objetivo'], 'string'],
             [['status'], 'string', 'max' => 20],
             [['numero_cheque', 'nf_recibo'], 'string', 'max' => 50],
@@ -168,22 +169,34 @@ class Despesa extends \yii\db\ActiveRecord
         if(!parent::beforeSave($insert)){
             return false;
         }
-        if($this->data_emissao_NF != NULL){
-            $this->data_emissao_NF = \DateTime::createFromFormat('d/m/Y', $this->data_emissao_NF)->format('Y-m-d');
+
+        if(!empty($this->data_emissao_NF)){
+            $this->data_emissao_NF = DateTime::createFromFormat('d/m/Y', $this->data_emissao_NF)->format('Y-m-d');
         }
-        if($this->data_pgto != NULL){
-            $this->data_pgto = \DateTime::createFromFormat('d/m/Y', $this->data_pgto)->format('Y-m-d');
+        if(!empty($this->data_pgto)){
+            $this->data_pgto = DateTime::createFromFormat('d/m/Y', $this->data_pgto)->format('Y-m-d');
         }
         
         return true;
-      }
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        if(!empty($this->data_emissao_NF)){
+            $this->data_emissao_NF = date('d/m/Y', strtotime($this->data_emissao_NF));
+        }
+        if(!empty($this->data_pgto)){
+            $this->data_pgto = date('d/m/Y', strtotime($this->data_pgto));
+        }
+    }
 
     public function afterFind(){
         parent::afterFind();
-        if($this->data_emissao_NF != NULL){
+        if(!empty($this->data_emissao_NF)){
             $this->data_emissao_NF = date('d/m/Y', strtotime($this->data_emissao_NF));
         }
-        if($this->data_pgto != NULL){
+        if(!empty($this->data_pgto)){
             $this->data_pgto = date('d/m/Y', strtotime($this->data_pgto));
         }
         return true;
@@ -191,7 +204,7 @@ class Despesa extends \yii\db\ActiveRecord
 
     public function upload()
     {
-        if ($this->validate()) {
+        if ($this->validate('anexo')) {
             $this->anexo->saveAs('uploads/despesas/d_' . $this->id . '.' . $this->anexo->extension);
             return true;
         } else {

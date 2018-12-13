@@ -15,6 +15,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
+use yii\helpers\FileHelper;
 
 //debugger para restrear erros se tiver
 /*function dbg() {
@@ -117,19 +118,12 @@ class DespesaController extends Controller
 
             $despesaModel->anexo = UploadedFile::getInstance($despesaModel, 'anexo');
 
-            $beneficiarioModel->load(Yii::$app->request->post());
-            $fornecedorModel->load(Yii::$app->request->post());
-            $itemModel->load(Yii::$app->request->post());
-            $despesapassagemModel->load(Yii::$app->request->post());
-            $despesadiariaModel->load(Yii::$app->request->post());
-
-            if(!empty($beneficiarioModel->nome) || !empty($beneficiarioModel->rg)){
+            if($beneficiarioModel->load(Yii::$app->request->post())){
                 $beneficiarioModel->save();
                 $despesaModel->id_beneficiario = $beneficiarioModel->id;
             }
 
-
-            if(!empty($fornecedorModel->nome) || !empty($fornecedorModel->cpf_cnpj)){
+            if($fornecedorModel->load(Yii::$app->request->post())){
                 $fornecedor = Fornecedor::find()->where(['cpf_cnpj' => $fornecedorModel->cpf_cnpj])->one();
                 if(!isset($fornecedor)){
                     $fornecedorModel->save();
@@ -140,19 +134,22 @@ class DespesaController extends Controller
             }
 
             if ($despesaModel->save() ){
-                if(!empty($despesapassagemModel->data_hora_ida) || !empty($despesapassagemModel->data_hora_volta) || !empty($despesapassagemModel->destino) || !empty($despesapassagemModel->localizador)){
+                if($despesapassagemModel->load(Yii::$app->request->post())){
                     $despesapassagemModel->id_despesa = $despesaModel->id;
                     $despesapassagemModel->save();
                 }
-                if(!empty($despesadiariaModel->data_hora_ida) || !empty($despesadiariaModel->data_hora_volta) || !empty($despesadiariaModel->destino) || !empty($despesadiariaModel->localizador)){
+                if($despesadiariaModel->load(Yii::$app->request->post())){
                     $despesadiariaModel->id_despesa = $despesaModel->id ;
                     $despesadiariaModel->save();
                 }
-                if (!empty($despesaModel->anexo) and $despesaModel->upload()) {
-                    $despesaModel->anexo = "d_" . $despesaModel->id . '.' . $despesaModel->anexo->extension;
+                if (!empty($despesaModel->anexo)) {
+                    if($despesaModel->upload()){
+                        $despesaModel->anexo = "d_" . $despesaModel->id . '.' . $despesaModel->anexo->extension;
+                    }else{
+                        $despesaModel->anexo = null;
+                        $this->mensagens('danger', 'Erro', 'Houve um problema ao fazer upload do anexo.');
+                    }
                     $despesaModel->save();
-                }else{
-                    $this->mensagens('danger', 'Erro', 'Houve um problema ao fazer upload do anexo.');
                 }
                 return $this->redirect(['view', 'id' => $despesaModel->id]);
             }
@@ -218,11 +215,9 @@ class DespesaController extends Controller
         
         if ($despesaModel->load(Yii::$app->request->post())) {
 
-            $beneficiarioModel->load(Yii::$app->request->post());
-            $fornecedorModel->load(Yii::$app->request->post());
-            $itemModel->load(Yii::$app->request->post());
+            $despesaModel->anexo = UploadedFile::getInstance($despesaModel, 'anexo');
 
-            if(!empty($beneficiarioModel->nome) || !empty($beneficiarioModel->rg)){
+            if($beneficiarioModel->load(Yii::$app->request->post())){
                 $beneficiario = Beneficiario::find()->where(['rg' => $beneficiarioModel->rg])->one();
                 if(!isset($beneficiario)){
                     $beneficiarioModel->save();
@@ -238,7 +233,7 @@ class DespesaController extends Controller
                 $despesaModel->id_beneficiario = null;
             }
 
-            if(!empty($fornecedorModel->nome) || !empty($fornecedorModel->cpf_cnpj)){
+            if($fornecedorModel->load(Yii::$app->request->post())){
                 $fornecedor = Fornecedor::find()->where(['cpf_cnpj' => $fornecedorModel->cpf_cnpj])->one();
                 if(!isset($fornecedor)){
                     $fornecedorModel->save();
@@ -251,25 +246,37 @@ class DespesaController extends Controller
                 }
             }
 
-            if(!empty($fornecedorModel->nome) || !empty($fornecedorModel->cpf_cnpj)){
-                $fornecedor = Fornecedor::find()->where(['cpf_cnpj' => $fornecedorModel->cpf_cnpj])->one();
-                if(!isset($fornecedor)){
-                    $fornecedorModel->save();
-                    $despesaModel->id_fornecedor = $fornecedorModel->id;
-                }else{
-                    $despesaModel->id_fornecedor = $fornecedor->id;
-                }
-            }
-
             if ($despesaModel->save() ){
-                if(!empty($despesapassagemModel->data_hora_ida) || !empty($despesapassagemModel->data_hora_volta) || !empty($despesapassagemModel->destino) || !empty($despesapassagemModel->localizador)){
+                if($despesapassagemModel->load(Yii::$app->request->post())){
                     $despesapassagemModel->id_despesa = $despesaModel->id;
                     $despesapassagemModel->save();
 
                 }
-                if(!empty($despesadiariaModel->data_hora_ida) || !empty($despesadiariaModel->data_hora_volta) || !empty($despesadiariaModel->destino) || !empty($despesadiariaModel->localizador)){
+                if($despesadiariaModel->load(Yii::$app->request->post())){
                     $despesadiariaModel->id_despesa = $despesaModel->id ;
                     $despesadiariaModel->save();
+                }
+                if (!empty($despesaModel->anexo)) {
+
+                    $path = Yii::getAlias('@backend/web/uploads/despesas/');
+                    $files = FileHelper::findFiles($path, [
+                        'only' => ['d_' . $despesaModel->id . '.*'],
+                    ]);
+
+                    if(!empty($files[0])) {
+                        $file = $files[0];
+                        if (file_exists($file)) {
+                            unlink($file);
+                        }
+                    }
+
+                    if($despesaModel->upload()){
+                        $despesaModel->anexo = "d_" . $despesaModel->id . '.' . $despesaModel->anexo->extension;
+                    }else{
+                        $despesaModel->anexo = null;
+                        $this->mensagens('danger', 'Erro', 'Houve um problema ao fazer upload do anexo.');
+                    }
+                    $despesaModel->save();
                 }
                 return $this->redirect(['view', 'id' => $despesaModel->id]);
             }
@@ -298,8 +305,22 @@ class DespesaController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
 
+        if (!empty($model->anexo)) {
+            $path = Yii::getAlias('@backend/web/uploads/despesas/');
+            $files = FileHelper::findFiles($path, [
+                'only' => ['d_' . $model->id . '.*'],
+            ]);
+
+            if(!empty($files[0])) {
+                $file = $files[0];
+                if (file_exists($file)) {
+                    unlink($file);
+                }
+            }
+        }
+        $model->delete();
         return $this->redirect(['index']);
     }
 
