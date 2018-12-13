@@ -15,6 +15,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
+use yii\helpers\FileHelper;
 
 //debugger para restrear erros se tiver
 /*function dbg() {
@@ -148,12 +149,7 @@ class DespesaController extends Controller
                         $despesaModel->anexo = null;
                         $this->mensagens('danger', 'Erro', 'Houve um problema ao fazer upload do anexo.');
                     }
-                    if($despesaModel->save()){
-
-                    }else{
-                        echo 'nao foi';
-                        die();
-                    }
+                    $despesaModel->save();
                 }
                 return $this->redirect(['view', 'id' => $despesaModel->id]);
             }
@@ -219,6 +215,8 @@ class DespesaController extends Controller
         
         if ($despesaModel->load(Yii::$app->request->post())) {
 
+            $despesaModel->anexo = UploadedFile::getInstance($despesaModel, 'anexo');
+
             if($beneficiarioModel->load(Yii::$app->request->post())){
                 $beneficiario = Beneficiario::find()->where(['rg' => $beneficiarioModel->rg])->one();
                 if(!isset($beneficiario)){
@@ -258,6 +256,28 @@ class DespesaController extends Controller
                     $despesadiariaModel->id_despesa = $despesaModel->id ;
                     $despesadiariaModel->save();
                 }
+                if (!empty($despesaModel->anexo)) {
+
+                    $path = Yii::getAlias('@backend/web/uploads/despesas/');
+                    $files = FileHelper::findFiles($path, [
+                        'only' => ['d_' . $despesaModel->id . '.*'],
+                    ]);
+
+                    if(!empty($files[0])) {
+                        $file = $files[0];
+                        if (file_exists($file)) {
+                            unlink($file);
+                        }
+                    }
+
+                    if($despesaModel->upload()){
+                        $despesaModel->anexo = "d_" . $despesaModel->id . '.' . $despesaModel->anexo->extension;
+                    }else{
+                        $despesaModel->anexo = null;
+                        $this->mensagens('danger', 'Erro', 'Houve um problema ao fazer upload do anexo.');
+                    }
+                    $despesaModel->save();
+                }
                 return $this->redirect(['view', 'id' => $despesaModel->id]);
             }
 
@@ -285,8 +305,22 @@ class DespesaController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
 
+        if (!empty($model->anexo)) {
+            $path = Yii::getAlias('@backend/web/uploads/despesas/');
+            $files = FileHelper::findFiles($path, [
+                'only' => ['d_' . $model->id . '.*'],
+            ]);
+
+            if(!empty($files[0])) {
+                $file = $files[0];
+                if (file_exists($file)) {
+                    unlink($file);
+                }
+            }
+        }
+        $model->delete();
         return $this->redirect(['index']);
     }
 

@@ -266,6 +266,13 @@ $this->registerJs($script, View::POS_READY);
 
     <div class="row">
         <div class="col-xs-4">
+            <?php
+            if(!$despesaModel->isNewRecord){
+                $dir = 'uploads/despesas/'.$despesaModel->anexo;
+                $f = $despesaModel->anexo;
+                echo "<h4>Anexo atual: <a target='_blank' href='$dir'>$f</a></h4>";
+            }
+            ?>
             <?= $form->field($despesaModel, 'anexo')->fileInput() ?>
         </div>
     </div>
